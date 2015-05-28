@@ -1,0 +1,4 @@
+# $Id: givetake.sudo 265 2015-05-11 22:34:20Z ohare2 $
+# $URL: https://corbin.llnl.gov/repos/admin/givetake/givetake.sudo $
+# Users allowed to use give and take to share files
+%users ALL=(root)	/usr/bin/give,/usr/bin/take
