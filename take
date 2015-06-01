@@ -1,0 +1,129 @@
+#!/bin/bash
+# $Id: take 229 2014-11-14 02:10:48Z rohare $
+# $URL: file:///usr/local/svn/admin/givetake/take $
+# Take files from givetake directory
+
+realuser=`who am i | cut -d' ' -f1`
+
+usage() {
+	echo "Usage: sudo take [-dhlt] [<giver>] [<filename>] {<filename>]"
+	echo "            -d  Remove given files"
+	echo "            -h  Display usage message"
+	echo "            -l  List given files"
+	echo "            -t  Take given files"
+	echo ""
+	echo "                The default is to take given files"
+	echo ""
+	exit 0
+}
+
+if [ ${USER} != 'root' ]; then
+	echo "Error: must be executed by root."
+	echo ""
+	usage
+fi
+
+source /etc/give.conf   # read config file
+
+# parse arguments
+if [ $# -eq 0 ] || [ $1 == '-h' ]; then
+	usage
+elif [ $1 == '-d' ]; then
+	opt=delete
+	shift
+elif [ $1 == '-l' ]; then
+	opt=list
+	shift
+elif [ $1 == '-t' ]; then
+	opt=take
+	shift
+else
+	opt=take
+fi
+if [ $# -eq 0 ]; then
+	giver_parm=''
+else
+	giver_parm=$1
+	shift
+fi
+if [ $# -eq 0 ]; then
+	file_parm=''
+else
+	file_parm=$1
+	shift
+fi
+
+queue=/var/tmp/give     # file staging directory
+if [ ! -d "$queue" ]; then
+	echo "Error: $queue directory missing, unable to proceed."
+	exit 1
+fi
+
+dataFile=''
+data() {
+	metaName=$1
+	metaName=`echo "${metaName%%.*}"`
+	random=`echo "${metaName##*:}"`
+	dataFile="${random}.file.aes"
+}
+
+result=''
+printlist() {
+	if [ "$result" != "" ]; then
+		echo "$result" | sort -t':' -k 1,2 | awk -F ":" '
+			BEGIN {
+				name=" ";
+			}
+			{
+				if (name == $1) {
+					print "     " $2;
+					name=$1;
+				} else {
+					print $1;
+					print "     " $2;
+					name=$1;
+				}
+			}'
+	fi
+
+	exit 0
+}
+
+# main
+for filename in `ls "${queue}/"`; do
+	taker=`echo "${filename%:*}"`
+	taker=`echo "${taker##*:}"`
+	giver=`echo "${filename%%:*}"`
+	if [[ $taker == $realuser ]]; then
+		if [[ $giver == $giver_parm || $giver_parm == '' ]]; then
+			contents=`openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$filename`
+			if [[ $contents == $file_parm || $file_parm == '' ]]; then
+				if [[ $opt == 'take' ]]; then
+					data "$filename"
+					openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$dataFile -out $contents
+					chown ${realuser}:${realuser} $contents
+					chmod 600 $contents
+					rm ${queue}/$filename
+					rm ${queue}/$dataFile
+				elif [[ $opt == 'delete' ]]; then
+					data "$filename"
+					rm ${queue}/$filename
+					rm ${queue}/$dataFile
+				elif [[ $opt == 'list' ]]; then
+					if [[ $result == '' ]]; then
+						result="$giver:$contents"
+					else
+						result="$result"$'\n'"$giver:$contents"
+					fi
+				else
+					echo "no option specified"
+				fi
+			fi
+		fi
+	fi
+done
+
+if [[ $opt == 'list' ]]; then
+	printlist
+fi
+
