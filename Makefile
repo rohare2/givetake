@@ -3,7 +3,7 @@
 #
 Name= give_zdiv
 Version= 1.0
-Release= 244
+Release= 245
 Source= ${Name}-${Version}-${Release}.tgz
 BASE= ${shell pwd}
 
@@ -32,7 +32,7 @@ source:
 		mkdir ${RPMBUILD}/SOURCES/${Name}; \
 	fi
 	rsync -av * ${RPMBUILD}/SOURCES/${Name}
-	tar czvf ${RPMBUILD}/SOURCES/${Source} --exclude=.svn -C ${RPMBUILD}/SOURCES ${Name}
+	tar czvf ${RPMBUILD}/SOURCES/${Source} --exclude=.git -C ${RPMBUILD}/SOURCES ${Name}
 	rm -fr ${RPMBUILD}/SOURCES/${Name}
 
 install: make_path etc sudo bin
