@@ -1,9 +1,10 @@
-#$Id: Makefile 265 2015-05-11 22:34:20Z ohare2 $
-#$HeadURL: https://corbin.llnl.gov/repos/admin/givetake/Makefile $
+# Makefile
+# $Id$
+# $Date$
 #
 Name= give_zdiv
-Version= 1.0
-Release= 245
+Version= 1.1
+Release= 1
 Source= ${Name}-${Version}-${Release}.tgz
 BASE= ${shell pwd}
 

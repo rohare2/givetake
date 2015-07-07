@@ -1,4 +1,4 @@
-# $Id: spec 202 2014-11-02 19:35:05Z rohare $
+# $Id$
 # $URL: https://www.ohares.us/repos/admin/givetake/spec $
 #
 # Author: Rich O'Hare  <rohare2@gmail.com>
@@ -6,8 +6,8 @@
 # Give/Take file sharing tools
 #
 %define Name give_zdiv
-%define Version 1.0
-%define Release 245
+%define Version 1.1
+%define Release 1
 
 Name: %{Name}
 Version: %{Version}

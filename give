@@ -1,6 +1,7 @@
 #!/bin/sh
-# $Id: give 242 2014-11-13 15:39:30Z ohare2 $
-# $URL: https://corbin.llnl.gov/repos/admin/givetake/give $
+# give
+# $Id$
+# $Date$
 # Safely give files to associates
 
 realuser=`who am i | cut -d' ' -f1`
@@ -9,7 +10,7 @@ realuser=`who am i | cut -d' ' -f1`
 source /etc/give.conf
 	
 # File staging directory
-queue=/var/tmp/give
+queue=/usr/local/give
 if [ ! -d "$queue" ]; then
 	echo "Error: $queue directory missing, unable to proceed."
 	exit 1

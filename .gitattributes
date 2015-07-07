@@ -1,0 +1,12 @@
+give ident
+give.conf ident
+givetake.sudo ident
+Makefile ident
+spec ident
+take ident
+give filter=dater
+give.conf filter=dater
+givetake.sudo filter=dater
+Makefile filter=dater
+spec filter=dater
+take filter=dater

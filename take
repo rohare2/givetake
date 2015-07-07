@@ -1,6 +1,7 @@
 #!/bin/bash
-# $Id: take 242 2014-11-13 15:39:30Z ohare2 $
-# $URL: https://corbin.llnl.gov/repos/admin/givetake/take $
+# take
+# $Id$
+# $Date$
 # Take files from givetake directory
 
 realuser=`who am i | cut -d' ' -f1`
@@ -53,7 +54,7 @@ else
 	shift
 fi
 
-queue=/var/tmp/give     # file staging directory
+queue=/usr/local/give     # file staging directory
 if [ ! -d "$queue" ]; then
 	echo "Error: $queue directory missing, unable to proceed."
 	exit 1
