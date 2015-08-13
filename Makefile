@@ -25,10 +25,10 @@ BIN_FILES= give \
 
 WEB_BASE= /var/www/html/software
 
-rpmbuild: rpmbuild2 copy2web
+rpmbuild: rpmbuild2
 
 rpmbuild2: specfile source
-	rpmbuild -bb --buildroot ${RPM_BUILD_ROOT} ${RPMBUILD}/SPECS/${Name}-${Version}-${Release}.spec
+	rpmbuild -bb --sign --buildroot ${RPM_BUILD_ROOT} ${RPMBUILD}/SPECS/${Name}-${Version}-${Release}.spec
 
 specfile: spec
 	@cat ./spec > ${RPMBUILD}/SPECS/${Name}-${Version}-${Release}.spec
