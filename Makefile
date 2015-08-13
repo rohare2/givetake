@@ -22,7 +22,9 @@ SUDO_FILES= givetake.sudo
 BIN_FILES= give \
 	take
 
-rpmbuild: specfile source
+WEB_BASE= /var/www/html/software
+
+rpmbuild: specfile source copy2web
 	rpmbuild -bb --buildroot ${RPM_BUILD_ROOT} ${RPMBUILD}/SPECS/${Name}-${Version}-${Release}.spec
 
 specfile: spec
@@ -84,3 +86,12 @@ localinstall: uid_chk
 uid_chk:
 	@if [ `id -u` != 0 ]; then echo You must become root first; exit 1; fi
 
+copy2web:
+	for net in gs hal jwics titan wnet; do \
+		for distro in centos redhat; do \
+			for vers in 5 6 7; do \
+				echo "$$net, $$distro, $$vers"; \
+				echo "cp ${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$disto/$$version/"; \
+			done; \
+		done; \
+	done

@@ -54,11 +54,13 @@ else
 	shift
 fi
 
-queue=/usr/local/give     # file staging directory
+queue=/usr/give     # file staging directory
 if [ ! -d "$queue" ]; then
 	echo "Error: $queue directory missing, unable to proceed."
 	exit 1
 fi
+chown root:root $queue
+chmod 700 $queue
 
 dataFile=''
 data() {
