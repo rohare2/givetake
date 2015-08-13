@@ -7,7 +7,7 @@
 #
 %define Name give_zdiv
 %define Version 1.1
-%define Release 1
+%define Release 2
 
 Name: %{Name}
 Version: %{Version}
