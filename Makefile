@@ -10,6 +10,7 @@ BASE= ${shell pwd}
 
 RPMBUILD= ${HOME}/rpmbuild
 RPM_BUILD_ROOT= ${RPMBUILD}/BUILDROOT
+TARGET_DIR= ${RPMBUILD}/RPMS/noarch
 
 ETC_DIR= /etc
 SUDO_DIR= /etc/sudoers.d
@@ -24,7 +25,9 @@ BIN_FILES= give \
 
 WEB_BASE= /var/www/html/software
 
-rpmbuild: specfile source copy2web
+rpmbuild: rpmbuild2 copy2web
+
+rpmbuild2: specfile source
 	rpmbuild -bb --buildroot ${RPM_BUILD_ROOT} ${RPMBUILD}/SPECS/${Name}-${Version}-${Release}.spec
 
 specfile: spec
@@ -87,11 +90,10 @@ uid_chk:
 	@if [ `id -u` != 0 ]; then echo You must become root first; exit 1; fi
 
 copy2web:
-	for net in gs hal jwics titan wnet; do \
+	for net in gs hal jwics wnet; do \
 		for distro in centos redhat; do \
 			for vers in 5 6 7; do \
-				echo "$$net, $$distro, $$vers"; \
-				echo "cp ${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$disto/$$version/"; \
+				cp ${TARGET_DIR}/${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$distro/$$vers/noarch/; \
 			done; \
 		done; \
 	done
