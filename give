@@ -10,7 +10,7 @@ realuser=`who am i | cut -d' ' -f1`
 source /etc/give.conf
 	
 # File staging directory
-queue=/usr/give
+queue=/usr/local/give
 if [ ! -d "$queue" ]; then
 	echo "Error: $queue directory missing, unable to proceed."
 	exit 1
@@ -20,10 +20,14 @@ chmod 700 $queue
 
 # usage message
 usage() {
-	echo "usage: give [ -l | -d | -h ] <uname_to_give_to> <file_to_give> [file_to_give] ..."
+	echo "usage: give [ -s ] <uname_to_give_to> <file_to_give>"
+	echo "usage: give  -l [ <uname_given> ]"
+	echo "usage: give  -d [[ <uname_to_delete_from> ] [ <file_to_delete> ]]"
+	echo "usage: give  -h"
 	echo "       -d    # Delete given files" 
 	echo "       -h    # Diplay this usage message" 
 	echo "       -l    # List files given"
+	echo "       -s    # Send email notification when taken"
 	exit 0
 }
 
@@ -36,7 +40,7 @@ list() {
 				fi
 			fi
 			data=`openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$file`
-			to=`echo $file | sed 's/.*:\(.*\):.*/\1/'`
+			to=`echo $file | awk -F":" '{print $2}'`
 			if [ "$data" != "" ]; then
 				if [[ $result == '' ]]; then
 					result="$to:$data"
@@ -110,6 +114,13 @@ if [ $# -eq 0 ] || [ $1 == '-h' ]; then
 	usage
 fi
 
+# Notify when taken
+notify=0
+if [ $1 == '-s' ]; then
+	notify=1
+	shift
+fi
+
 # List files user was given 
 if [ $1 == '-l' ]; then
 	shift
@@ -138,7 +149,6 @@ if [ $1 == '-d' ]; then
 		fi
 	fi
 fi
-
 
 # Don't allow root to give files
 if [ ${USER} != 'root' ]; then
@@ -215,7 +225,7 @@ while [[ $# > 0 ]]; do
 	# Generate random number
 	randNo=$(dd if=/dev/urandom count=4 2> /dev/null | md5sum | cut -c 1-16)
 	
-	meta="${realuser}:${recipient}:$randNo.meta"	# meta data file name
+	meta="${realuser}:${recipient}:${notify}:$randNo.meta"	# meta data file name
 	alias="$randNo.file"	                        # alias name for the file
 
 	# Create meta data file

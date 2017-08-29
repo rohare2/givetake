@@ -6,8 +6,8 @@
 # Give/Take file sharing tools
 #
 %define Name give_zdiv
-%define Version 1.1
-%define Release 2
+%define Version 1.2
+%define Release 1
 
 Name: %{Name}
 Version: %{Version}
@@ -44,6 +44,7 @@ exit 0
 %defattr(755, root, root)
 %attr(600, -, -) /etc/give.conf
 %attr(440, -, -) /etc/sudoers.d/givetake
-%attr(755, -, -) /usr/bin/give
-%attr(755, -, -) /usr/bin/take
+%attr(751, -, -) /usr/bin/give
+%attr(751, -, -) /usr/bin/take
+%dir %attr(700, -, -) /usr/local/give
 

@@ -3,8 +3,8 @@
 # $Date$
 #
 Name= give_zdiv
-Version= 1.1
-Release= 2
+Version= 1.2
+Release= 1
 Source= ${Name}-${Version}-${Release}.tgz
 BASE= ${shell pwd}
 
@@ -15,6 +15,7 @@ TARGET_DIR= ${RPMBUILD}/RPMS/noarch
 ETC_DIR= /etc
 SUDO_DIR= /etc/sudoers.d
 BIN_DIR= /usr/bin
+DATA_DIR= /usr/local/give
 
 ETC_FILES= give.conf
 
@@ -53,6 +54,9 @@ make_path:
 	@if [ ! -d ${RPM_BUILD_ROOT}/${BIN_DIR} ]; then \
 		mkdir -m 0755 -p ${RPM_BUILD_ROOT}/${BIN_DIR}; \
 	fi;
+	@if [ ! -d ${RPM_BUILD_ROOT}/${DATA_DIR} ]; then \
+		mkdir -m 0700 -p ${RPM_BUILD_ROOT}/${DATA_DIR}; \
+	fi;
 
 etc:
 	@for file in ${ETC_FILES}; do \
@@ -82,17 +86,22 @@ localinstall: uid_chk
 	@for file in ${SUDO_FILES}; do \
 		install -p $$file ${SUDO_DIR}/givetake -o root -g root -m 440; \
 	done
-	@for file in ${SCRIPT_FILES}; do \
-		install -p $$file ${SCRIPT_DIR} -o root -g root -m 755; \
+	@for file in ${BIN_FILES}; do \
+		install -p $$file ${BIN_DIR} -o root -g root -m 711; \
 	done
 
 uid_chk:
 	@if [ `id -u` != 0 ]; then echo You must become root first; exit 1; fi
 
 copy2web:
-	for net in gs hal jwics wnet; do \
-		for distro in centos redhat; do \
+	@for net in gs hal jwics; do \
+		for distro in centos; do \
 			for vers in 5 6 7; do \
+				cp ${TARGET_DIR}/${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$distro/$$vers/noarch/; \
+			done; \
+		done; \
+		for distro in redhat; do \
+			for vers in 5 6 7Server 7Workstation; do \
 				cp ${TARGET_DIR}/${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$distro/$$vers/noarch/; \
 			done; \
 		done; \
