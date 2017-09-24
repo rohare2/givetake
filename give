@@ -1,0 +1,230 @@
+#!/bin/sh
+# $Id: give 222 2014-11-10 07:52:12Z rohare $
+# $URL: file:///usr/local/svn/admin/givetake/give $
+# Safely give files to associates
+
+realuser=`who am i | cut -d' ' -f1`
+
+# read config file
+source /etc/give.conf
+	
+# File staging directory
+queue=/usr/local/give
+if [ ! -d "$queue" ]; then
+	echo "Error: $queue directory missing, unable to proceed."
+	exit 1
+fi
+
+# usage message
+usage() {
+	echo "usage: give [ -l | -d | -h ] <uname_to_give_to> <file_to_give> [file_to_give] ..."
+	echo "       -d    # Delete given files" 
+	echo "       -h    # Diplay this usage message" 
+	echo "       -l    # List files given"
+	exit 0
+}
+
+list() {
+	for file in `ls "${queue}/" 2> /dev/null`; do
+		if [[ "$file" == ${realuser}:* ]]; then
+			if [ $# -ne 0 ]; then
+				if [[ "$file" != ${realuser}:$1:* ]]; then
+					continue
+				fi
+			fi
+			data=`openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$file`
+			to=`echo $file | sed 's/.*:\(.*\):.*/\1/'`
+			if [ "$data" != "" ]; then
+				if [[ $result == '' ]]; then
+					result="$to:$data"
+				else 
+					result="$result"$'\n'"$to:$data"
+				fi
+			fi
+		fi
+	done
+}
+
+printlist() {
+	if [ "$result" != "" ]; then
+		echo "$result" | sort -t':' -k 1,2 | awk -F ":" '
+			BEGIN {
+				name=" ";
+			}
+			{
+				if (name == $1) {
+					print "     " $2;
+					name=$1;
+				} else {
+					print $1;
+					print "     " $2;
+					name=$1;
+				}
+			}'
+	fi
+
+	exit 0
+}
+
+# Delete given files
+delete() {
+	for file in `ls "${queue}/" 2> /dev/null`; do
+		if [[ "$file" == ${realuser}:* ]]; then
+			if [ $# -ne 0 ]; then
+				if [[ "$file" != ${realuser}:$1:* ]]; then
+					continue
+				else
+					if [ $# -gt 1 ]; then
+						fn=`openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$file`
+						if [[ $fn == $2 ]]; then
+							rm ${queue}/${file}
+							rand="${file##*:}"
+							rand="${rand%%.*}"
+							dfile="${rand}.file.aes"
+							rm ${queue}/${dfile}
+						fi
+					else
+						rm ${queue}/${file}
+						rand="${file##*:}"
+						rand="${rand%%.*}"
+						dfile="${rand}.file.aes"
+						rm ${queue}/${dfile}
+					fi
+				fi
+			else
+				rm ${queue}/${file}
+				rand="${file##*:}"
+				rand="${rand%%.*}"
+				dfile="${rand}.file.aes"
+				rm ${queue}/${dfile}
+			fi
+		fi
+	done
+}
+
+# Display help message
+if [ $# -eq 0 ] || [ $1 == '-h' ]; then
+	usage
+fi
+
+# List files user was given 
+if [ $1 == '-l' ]; then
+	shift
+	if [ $# -eq 0 ]; then
+		list 
+	else
+		list $1
+	fi
+	printlist
+fi
+
+# Delete given file
+if [ $1 == '-d' ]; then
+	shift
+	if [ $# -eq 0 ]; then
+		delete				# delete all
+	else
+		to=$1
+		shift
+		if [ $# -eq 0 ]; then
+			delete $to		# delete all to user
+		else
+			file=$1
+			shift
+			delete $to $file	# delete file given to user
+		fi
+	fi
+fi
+
+
+# Don't allow root to give files
+if [ ${USER} != 'root' ]; then
+	echo "Error: root or sudo root required."
+	exit 0
+fi
+
+# Is the recipient a valid user
+recipient=$1
+shift
+getent passwd $recipient >/dev/null
+if [ $? != 0 ]; then
+	echo "Invalid user name"
+	exit 0
+fi
+
+# Make sure user is allowed to give to recipient
+approved=0
+if [[ $realuser == *_* ]]; then
+	usr_ext=${realuser##*_}
+	recipient_ext=${recipient##*_}
+	if [ $usr_ext == $recipient_ext ]; then
+		approved=1
+	else
+		approved=0
+	fi
+else
+	approved=1
+fi
+if [ $approved -ne 1 ]; then
+	echo "User ${realuser} not approved to share files with user $recipient"
+	exit
+fi
+
+# Rename files and copy to queue
+while [[ $# > 0 ]]; do
+	# Make sure file has not already been given
+	list "$recipient"
+	ans=`echo $result | grep -c $1`
+	if [ $ans -gt 0 ]; then
+		echo "You have already given $1 to $recipient"
+		exit 0
+	fi
+
+	# Test file access
+	sudo -u ${USERNAME} test -d "$1"
+	ret=`echo $?`
+	if [ $ret -eq 0 ]; then
+		echo "You can not give a directory"
+		exit 1
+	fi
+	sudo -u ${USERNAME} test -e "$1"
+	ret=`echo $?`
+	if [ $ret -ne 0 ]; then
+		echo "$1 does not exit"
+		exit 1
+	fi
+	sudo -u ${USERNAME} test -r "$1"
+	ret=`echo $?`
+	if [ $ret -ne 0 ]; then
+		echo "You do not have read access to $1"
+		exit 1
+	fi
+	
+	# Strip the file path
+	file=${1##*/}
+
+	# Make shure urandom exists
+	if [ ! -c "/dev/urandom" ]; then
+		echo "/dev/urandom required but missing"
+		exit 1
+	fi
+
+	# Generate random number
+	randNo=$(dd if=/dev/urandom count=4 2> /dev/null | md5sum | cut -c 1-16)
+	
+	meta="${realuser}:${recipient}:$randNo.meta"	# meta data file name
+	alias="$randNo.file"	                        # alias name for the file
+
+	# Create meta data file
+	echo "$file" > ${queue}/${meta}
+	openssl enc -aes-256-ecb -pass pass:$pw -a -salt -in ${queue}/$meta -out ${queue}/${meta}.aes
+	chmod 700 ${queue}/${meta}.aes
+	rm ${queue}/${meta}
+
+	# Copy file to queue using alias name.
+	openssl enc -aes-256-ecb -pass pass:$pw -a -salt -in $1 -out ${queue}/${alias}.aes
+	chmod 700 ${queue}/${alias}.aes
+
+	shift
+done
+
