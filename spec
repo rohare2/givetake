@@ -1,5 +1,3 @@
-# $Id: spec 233 2014-11-14 04:40:37Z rohare $
-# $URL: file:///usr/local/svn/admin/givetake/spec $
 #
 # Author: Rich O'Hare  <rohare2@gmail.com>
 #

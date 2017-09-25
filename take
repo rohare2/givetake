@@ -1,6 +1,4 @@
 #!/bin/bash
-# $Id: take 229 2014-11-14 02:10:48Z rohare $
-# $URL: file:///usr/local/svn/admin/givetake/take $
 # Take files from givetake directory
 
 realuser=`who am i | cut -d' ' -f1`

@@ -1,4 +1,2 @@
-# $Id: givetake.sudo 232 2014-11-14 04:35:23Z rohare $
-# $URL: file:///usr/local/svn/admin/givetake/givetake.sudo $
 # Users allowed to use give and take to share files
 %users master=(root)	/usr/bin/give,/usr/bin/take

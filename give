@@ -1,6 +1,4 @@
 #!/bin/sh
-# $Id: give 222 2014-11-10 07:52:12Z rohare $
-# $URL: file:///usr/local/svn/admin/givetake/give $
 # Safely give files to associates
 
 realuser=`who am i | cut -d' ' -f1`

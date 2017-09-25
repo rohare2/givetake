@@ -1,5 +1,3 @@
-#$Id: Makefile 233 2014-11-14 04:40:37Z rohare $
-#$HeadURL: file:///usr/local/svn/admin/givetake/Makefile $
 #
 Name= give
 Version= 1.0
