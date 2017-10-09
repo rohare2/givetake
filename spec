@@ -40,7 +40,7 @@ exit 0
 
 %files
 %defattr(755, root, root)
-%attr(600, -, -) /etc/give.conf
+%config(noreplace) %attr(600, -, -) /etc/give.conf
 %attr(440, -, -) /etc/sudoers.d/givetake
 %attr(751, -, -) /usr/bin/give
 %attr(751, -, -) /usr/bin/take
