@@ -1,17 +1,13 @@
 # Makefile
-# $Id$
-# $Date$
-#
-Name= give_zdiv
+# $ID: $
+Name= give
 Version= 1.2
 Release= 1
-Source= ${Name}-${Version}-${Release}.tgz
 BASE= ${shell pwd}
 
 RPMBUILD= ${HOME}/rpmbuild
 RPM_BUILD_ROOT= ${RPMBUILD}/BUILDROOT
 TARGET_DIR= ${RPMBUILD}/RPMS/noarch
-
 ETC_DIR= /etc
 SUDO_DIR= /etc/sudoers.d
 BIN_DIR= /usr/bin
@@ -24,11 +20,7 @@ SUDO_FILES= givetake.sudo
 BIN_FILES= give \
 	take
 
-WEB_BASE= /var/www/html/software
-
-rpmbuild: rpmbuild2
-
-rpmbuild2: specfile source
+rpmbuild: specfile source
 	rpmbuild -bb --sign --buildroot ${RPM_BUILD_ROOT} ${RPMBUILD}/SPECS/${Name}-${Version}-${Release}.spec
 
 specfile: spec
@@ -93,16 +85,3 @@ localinstall: uid_chk
 uid_chk:
 	@if [ `id -u` != 0 ]; then echo You must become root first; exit 1; fi
 
-copy2web:
-	@for net in gs hal jwics; do \
-		for distro in centos; do \
-			for vers in 5 6 7; do \
-				cp ${TARGET_DIR}/${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$distro/$$vers/noarch/; \
-			done; \
-		done; \
-		for distro in redhat; do \
-			for vers in 5 6 7Server 7Workstation; do \
-				cp ${TARGET_DIR}/${Name}-${Version}-${Release}.noarch.rpm ${WEB_BASE}/$$net/$$distro/$$vers/noarch/; \
-			done; \
-		done; \
-	done

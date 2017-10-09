@@ -1,11 +1,9 @@
+# spec
 # $Id$
-# $URL: https://www.ohares.us/repos/admin/givetake/spec $
 #
 # Author: Rich O'Hare  <rohare2@gmail.com>
 #
-# Give/Take file sharing tools
-#
-%define Name give_zdiv
+%define Name give
 %define Version 1.2
 %define Release 1
 
@@ -16,9 +14,9 @@ Source: %{Name}-%{Version}-%{Release}.tgz
 License: GPLv2
 Group: SystemEnvironment/Base
 BuildArch: noarch
-URL: https://corbin.llnl.gov
-Vendor: LLNL
-Packager: Rich O'Hare <ohare2@llnl.gov
+URL: https://www.ohares.us
+Vendor: DVCAL
+Packager: Rich O'Hare <rohare2@gmail.com
 Provides: give take
 Summary: Secure file sharing tools
 %define _unpackaged_files_terminate_build 0
