@@ -5,7 +5,7 @@
 #
 %define Name givetake
 %define Version 1.2
-%define Release 1
+%define Release 2
 
 Name: %{Name}
 Version: %{Version}
