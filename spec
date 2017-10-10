@@ -3,7 +3,7 @@
 #
 # Author: Rich O'Hare  <rohare2@gmail.com>
 #
-%define Name give
+%define Name givetake
 %define Version 1.2
 %define Release 1
 
