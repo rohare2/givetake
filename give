@@ -40,6 +40,9 @@ list() {
 				fi
 			fi
 			data=`openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$file`
+			if [[ $? != 0 ]]; then
+				echo "${queue}/$file not encrypted with the current key"
+			fi
 			to=`echo $file | awk -F":" '{print $2}'`
 			if [ "$data" != "" ]; then
 				if [[ $result == '' ]]; then
@@ -83,6 +86,9 @@ delete() {
 				else
 					if [ $# -gt 1 ]; then
 						fn=`openssl enc -aes-256-ecb -pass pass:$pw -d -a -salt -in ${queue}/$file`
+						if [[ $? != 0 ]]; then
+							echo "${queue}/$file not encrypted with the current key"
+						fi
 						if [[ $fn == $2 ]]; then
 							rm ${queue}/${file}
 							rand="${file##*:}"
