@@ -1,6 +1,4 @@
 # README
-# $Id: $
-# $Date: $
 #
 Givetake is a Unix/Linux tool for sharing files with colleagues.  It provides a
 means for sharing files with others without fear of interception.  Sudo and
