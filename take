@@ -51,7 +51,6 @@ else
 	shift
 fi
 
-queue=/usr/local/give     # file staging directory
 if [ ! -d "$queue" ]; then
 	echo "Error: $queue directory missing, unable to proceed."
 	exit 1

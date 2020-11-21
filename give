@@ -10,7 +10,6 @@ realuser=`who am i | cut -d' ' -f1`
 source /etc/give.conf
 	
 # File staging directory
-queue=/usr/local/give
 if [ ! -d "$queue" ]; then
 	echo "Error: $queue directory missing, unable to proceed."
 	exit 1

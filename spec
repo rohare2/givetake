@@ -18,11 +18,16 @@ URL: https://www.ohares.us
 Vendor: DVCAL
 Packager: Rich O'Hare <rohare2@gmail.com
 Provides: give take
-Summary: Secure file sharing tools
+Summary: Secure and convenient file sharing tool
 %define _unpackaged_files_terminate_build 0
 
 %description
-Provides a means for sharing files with others without fear of interception.
+Provides a convenient means of sharing files without fear of interception.
+The Givetake package is composed of two shell scripts (give & take), that
+take advantage of sudo in order control access as well as provide encryption.
+Un-authorized users can not see or access given files.
+
+The package has been tested on Red Hat/CentOS versions 5 through 7.
 %conflicts give
 
 %prep
