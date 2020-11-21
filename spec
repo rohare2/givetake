@@ -28,6 +28,9 @@ take advantage of sudo in order control access as well as provide encryption.
 Un-authorized users can not see or access given files.
 
 The package has been tested on Red Hat/CentOS versions 5 through 7.
+
+Warning: Be sure to change the password that is stored in the give.conf
+file
 %conflicts give
 
 %prep
